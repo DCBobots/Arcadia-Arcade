@@ -1,0 +1,17 @@
+{
+  "name": "arcadia-arcade",
+  "version": "1.0.0",
+  "description": "No Otaku wants to be Alone!",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "PotatoRui",
+  "license": "ISC"
+}
