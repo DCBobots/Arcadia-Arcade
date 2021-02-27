@@ -1,17 +1,30 @@
 {
-  "name": "arcadia-arcade",
+  "name": "arcadia-arcade-bot",
   "version": "1.0.0",
   "description": "No Otaku wants to be Alone!",
+  "repository": "",
+  "bugs": "",
   "main": "index.js",
+  "private": true,
+  "author": "Otakunity Team",
+  "license": "ISC",
+  "scripts": {
+    "main": "index.js",
+    "start": "node index.js",
+    "lint": "eslint --ext .js"
+  },
   "dependencies": {
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
+    "eslint": "^7.20.0",
+    "module-alias": "^2.2.2",
     "mysql": "^2.18.1"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "PotatoRui",
-  "license": "ISC"
+  "_moduleAliases": {
+    "@root": ".",
+    "@util": "./util",
+    "@features": "./features/features",
+    "@commands": "./commands/commands",
+    "@schemas": "./schemas"
+  }
 }

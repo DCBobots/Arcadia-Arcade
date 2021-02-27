@@ -1,77 +1,23 @@
-const Discord = require('discord.js');
-require('dotenv').config();
-const fs = require('fs');
-const {
-    join
-} = require("path");
-const client = new Discord.Client();
-global.prefix = undefined;
+require('module-alias/register')
+require('dotenv').config()
 
-var mysql = require("mysql"),
-db = mysql.createConnection({
-    host:  process.env.MYSQL_SERVER,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASS,
-    database: process.env.MYSQL_DB,
-    charset: "utf8mb4"
-});
+const { Client } = require('discord.js')
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-});
+const client = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] })
 
-client.on("guildCreate", guild => {
-    let serverInfo = { 
-        name: guild.name,
-        id: guild.id,
-        prefix: "!"
-    };
-    let data = JSON.stringify(serverInfo);
-    fs.writeFileSync('config/' + guild.id + '.json', data);
+const commandBase = require('@root/commands/command-base')
+const initCommands = require('@root/commands/init-commands')
+const initFeatures = require('@root/features/init-features')
 
-    console.log("Joined a new guild: " + guild.name);
-    console.log("Joined a new guild: " + guild.id);
-});
+const cache = {}
 
-client.on("guildDelete", guild => {
-    console.log("Left a guild: " + guild.name);
-    console.log("Left a guild: " + guild.id);
+client.on('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}`)
+
+    await commandBase.loadPrefixes(client, cache)
+    await initCommands(client, cache)
+    await initFeatures(client, cache)
 })
 
-client.on('message', message => {
-    let rawdata = fs.readFileSync('config/'+ message.guild.id + '.json');
-    let serverinfodata = JSON.parse(rawdata);
-    global.prefix = serverinfodata.prefix;
-
-    // to prevent dm cmd exec
-    if (message.channel.type == "dm") {
-        message.reply(`<@${message.author.id}>, bawal DM yan kapatid. - PotatoRuisu`);
-        return;
-    };
-
-    if (message.author.bot) return;
-    if (message.content.startsWith(global.prefix) == false || !message.content.slice(global.prefix.length).trim().split(/ +/g).shift().toLowerCase() == true) return;
-
-    const args = message.content.slice(global.prefix.length).trim().split(/ +/g);
-    const commandname = args[0].toLowerCase();
-
-
-    const commandFiles = fs.readdirSync(join(__dirname, "cmd")).filter((file) => file.endsWith(".js"));
-    client.commands = new Discord.Collection();
-    for (const file of commandFiles) {
-        const command = require(join(__dirname, "cmd", `${file}`));
-        client.commands.set(command.name, command);
-    }
-
-    const command =
-        client.commands.get(commandname) ||
-        client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandname));
-
-    try {
-        command.execute(message, args);
-    } catch (error) {
-        message.reply("Command Not Found.").catch(console.error);
-    }
-});
-
-client.login();
+// client.setMaxListeners(11)
+client.login(process.env.DISCORD_TOKEN)
